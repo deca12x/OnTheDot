@@ -1,11 +1,12 @@
 "use client";
 
 import { useUser } from "@civic/auth-web3/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useAccount } from "wagmi";
 import { getRegistrationByWallet } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
+import Link from "next/link";
 
 export default function RedeemPage() {
   const { user, isLoading } = useUser();
@@ -17,19 +18,82 @@ export default function RedeemPage() {
   const [redeemComplete, setRedeemComplete] = useState(false);
   const [txHash, setTxHash] = useState<string>("");
 
-  // Check for existing registration when user is loaded
+  // Check if user has deposited on-chain
   useEffect(() => {
-    if (walletAddress) {
-      getRegistrationByWallet(walletAddress).then(setRegistration);
+    async function checkDeposit() {
+      if (!walletAddress) return;
+
+      try {
+        // Check both local storage and on-chain
+        const [localReg, { checkHasDeposited }] = await Promise.all([
+          getRegistrationByWallet(walletAddress),
+          import("@/lib/contract"),
+        ]);
+
+        const hasDepositedOnChain = await checkHasDeposited(walletAddress);
+
+        // Only set registration if user has actually deposited on-chain
+        if (hasDepositedOnChain && localReg) {
+          setRegistration(localReg);
+        } else if (hasDepositedOnChain) {
+          // Has deposit on-chain but no local record - still allow redemption
+          setRegistration({
+            name: "Anonymous",
+            walletAddress,
+            depositPaid: true,
+            depositTxHash: "",
+            portfolioLink: "",
+            hasUsedSubstratePolkadot: false,
+            technologiesUsed: {
+              ink: false,
+              evmSolidity: false,
+              polkaVM: false,
+              xcm: false,
+              polkadotJsApi: false,
+            },
+            precompilesFamiliarity: 1,
+          });
+        }
+      } catch (error) {
+        console.error("Error checking deposit:", error);
+      }
     }
+
+      checkDeposit();
   }, [walletAddress]);
+
+  const handleRedeem = useCallback(async () => {
+    if (!walletAddress || !registration) return;
+
+    setIsRedeeming(true);
+    try {
+      // Import contract functions
+      const { redeemDeposit } = await import("@/lib/contract");
+
+      // Call the redeem function on-chain
+      const redeemResult = await redeemDeposit();
+
+      if (!redeemResult.success) {
+        throw new Error("Redeem transaction failed");
+      }
+
+      setTxHash(redeemResult.txHash);
+      setRedeemComplete(true);
+    } catch (error) {
+      console.error("Error redeeming deposit:", error);
+      const errorMessage =
+        error instanceof Error ? error.message : "Error redeeming deposit. Please try again.";
+      alert(errorMessage);
+      setIsRedeeming(false);
+    }
+  }, [walletAddress, registration]);
 
   // Auto-start redemption if user has a valid registration
   useEffect(() => {
     if (registration && !redeemComplete && !isRedeeming) {
       handleRedeem();
     }
-  }, [registration, redeemComplete, isRedeeming]);
+  }, [registration, redeemComplete, isRedeeming, handleRedeem]);
 
   // Show loading state while Civic Auth initializes
   if (isLoading) {
@@ -68,37 +132,18 @@ export default function RedeemPage() {
             No Deposit to Withdraw
           </div>
           <div className="text-lg text-red-700 mb-6">
-            You haven't registered for the event or paid a deposit.
+            You haven&apos;t registered for the event or paid a deposit.
           </div>
-          <a
+          <Link
             href="/"
             className="inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
           >
             Register for Event
-          </a>
+          </Link>
         </div>
       </div>
     );
   }
-
-  const handleRedeem = async () => {
-    if (!walletAddress || !registration) return;
-
-    setIsRedeeming(true);
-    try {
-      // TODO: Implement actual smart contract redeem call
-      // For now, we'll simulate the redemption
-      await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulate network delay
-
-      const mockTxHash = "0x" + Math.random().toString(16).substring(2);
-      setTxHash(mockTxHash);
-      setRedeemComplete(true);
-    } catch (error) {
-      console.error("Error redeeming deposit:", error);
-      alert("Error redeeming deposit. Please try again.");
-      setIsRedeeming(false);
-    }
-  };
 
   // Redemption complete - show success
   if (redeemComplete) {
@@ -118,7 +163,7 @@ export default function RedeemPage() {
             <div className="bg-white p-3 rounded border mb-4">
               <p className="text-xs text-gray-600 mb-1">Transaction Hash:</p>
               <a
-                href={`https://polkadot.subscan.io/extrinsic/${txHash}`}
+                href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${txHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:text-blue-800 text-sm font-mono break-all"

@@ -11,7 +11,7 @@ export async function GET() {
     const fileContent = await fs.readFile(STORAGE_FILE, "utf-8");
     const registrations: EventRegistration[] = JSON.parse(fileContent);
     return NextResponse.json(registrations);
-  } catch (error) {
+  } catch {
     // If file doesn't exist or is empty, return empty array
     console.log("Storage file not found or empty, returning empty array");
     return NextResponse.json([]);
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     try {
       const fileContent = await fs.readFile(STORAGE_FILE, "utf-8");
       registrations = JSON.parse(fileContent);
-    } catch (error) {
+    } catch {
       // File doesn't exist yet, start with empty array
       registrations = [];
     }

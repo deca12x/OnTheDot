@@ -8,6 +8,8 @@ Tech Stack:
 - Contract deployed on Polkadot Hub TestNet (Polkadot parachain that is EVM) https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
 - Civic Auth (embedded wallet) https://www.civic.com/auth
 - Storage is on a file called storage.json and on the contract (no db)
+- Polkadot Hardhat framework https://docs.polkadot.com/develop/smart-contracts/dev-environments/hardhat/
+- Instead of wagmi/viem, use https://papi.how/
 
 Polkadot Bounty Details:
 

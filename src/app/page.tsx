@@ -74,8 +74,21 @@ export default function Home() {
             Tap chip at the venue to redeem deposit
           </div>
           <div className="text-sm text-green-600 mb-4">
-            Your 1 DOT deposit is secured on the blockchain
+            Your 1 PAS deposit is secured on the blockchain
           </div>
+          {existingRegistration.depositTxHash && (
+            <div className="bg-white p-3 rounded border mb-4">
+              <p className="text-xs text-gray-600 mb-1">Transaction Hash:</p>
+              <a
+                href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${existingRegistration.depositTxHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 text-sm font-mono break-all"
+              >
+                {existingRegistration.depositTxHash}
+              </a>
+            </div>
+          )}
           <div className="flex items-center justify-center">
             <div className="text-6xl">📱</div>
             <div className="mx-4 text-2xl">→</div>
@@ -96,21 +109,31 @@ export default function Home() {
 
     setIsSubmitting(true);
     try {
-      // No actual deposit required for testing - just simulate success
-      const mockTxHash = "0x" + Math.random().toString(16).substring(2);
+      // Import contract functions
+      const { makeDeposit } = await import("@/lib/contract");
 
+      // Make the deposit on-chain
+      const depositResult = await makeDeposit();
+
+      if (!depositResult.success) {
+        throw new Error("Deposit transaction failed");
+      }
+
+      // Only save to storage.json after successful deposit
       const registration: EventRegistration = {
         ...formData,
         walletAddress: walletAddress,
-        depositPaid: true, // Mark as paid for testing purposes
-        depositTxHash: mockTxHash,
+        depositPaid: true,
+        depositTxHash: depositResult.txHash,
       };
 
       await saveRegistration(registration);
       setExistingRegistration(registration);
     } catch (error) {
       console.error("Error submitting registration:", error);
-      alert("Error submitting registration. Please try again.");
+      const errorMessage =
+        error instanceof Error ? error.message : "Error submitting registration. Please try again.";
+      alert(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -131,16 +154,21 @@ export default function Home() {
   return (
     <div className="min-h-screen py-8 px-4">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            ETHRome 2025 Event Registration
-          </h1>
-          <p className="text-gray-600">
-            Complete your registration and pay 1 DOT deposit
-          </p>
-          <p className="text-sm text-gray-500 mt-2">
-            Connected as: {user.name || user.email}
-          </p>
+        <div className="flex justify-between items-start mb-8">
+          <div className="text-center flex-1">
+            <h1 className="text-3xl font-bold mb-2">
+              ETHRome 2025 Event Registration
+            </h1>
+            <p className="text-gray-600">
+              Complete your registration and pay 1 PAS deposit
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Connected as: {user.name || user.email}
+            </p>
+          </div>
+          <div className="flex-shrink-0">
+            <ConnectButton />
+          </div>
         </div>
 
         <form
@@ -299,8 +327,8 @@ export default function Home() {
             className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
           >
             {isSubmitting
-              ? "Processing..."
-              : "Complete Registration (Testing - No Deposit Required)"}
+              ? "Processing Deposit..."
+              : "Complete Registration & Pay 1 PAS Deposit"}
           </button>
         </form>
       </div>
