@@ -1,6 +1,6 @@
 "use client";
 
-import { useUser, useWallet } from "@civic/auth-web3/react";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useState, useEffect, useCallback } from "react";
 import { getRegistrationByWallet } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
@@ -8,8 +8,10 @@ import ConnectButton from "@/components/ConnectButton";
 import Link from "next/link";
 
 export default function RedeemPage() {
-  const { user, isLoading } = useUser();
-  const { address: walletAddress } = useWallet({ type: "ethereum" });
+  const { ready, authenticated, user } = usePrivy();
+  const { wallets } = useWallets();
+  const wallet = wallets[0]; // Get the first connected wallet
+  const walletAddress = wallet?.address;
   const [registration, setRegistration] = useState<EventRegistration | null>(
     null
   );
@@ -58,19 +60,28 @@ export default function RedeemPage() {
       }
     }
 
-      checkDeposit();
+    checkDeposit();
   }, [walletAddress]);
 
   const handleRedeem = useCallback(async () => {
-    if (!walletAddress || !registration) return;
+    if (!walletAddress || !registration || !wallet) return;
 
     setIsRedeeming(true);
     try {
+      // Get the wallet provider from Privy
+      const provider = await wallet.getEthereumProvider();
+
+      if (!provider) {
+        throw new Error(
+          "Wallet provider not available. Please ensure you're logged in with Privy."
+        );
+      }
+
       // Import contract functions
       const { redeemDeposit } = await import("@/lib/contract");
 
-      // Call the redeem function on-chain
-      const redeemResult = await redeemDeposit();
+      // Call the redeem function on-chain using Privy's embedded wallet
+      const redeemResult = await redeemDeposit(provider);
 
       if (!redeemResult.success) {
         throw new Error("Redeem transaction failed");
@@ -81,11 +92,13 @@ export default function RedeemPage() {
     } catch (error) {
       console.error("Error redeeming deposit:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Error redeeming deposit. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Error redeeming deposit. Please try again.";
       alert(errorMessage);
       setIsRedeeming(false);
     }
-  }, [walletAddress, registration]);
+  }, [walletAddress, registration, wallet]);
 
   // Auto-start redemption if user has a valid registration
   useEffect(() => {
@@ -94,8 +107,8 @@ export default function RedeemPage() {
     }
   }, [registration, redeemComplete, isRedeeming, handleRedeem]);
 
-  // Show loading state while Civic Auth initializes
-  if (isLoading) {
+  // Show loading state while Privy initializes
+  if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -104,7 +117,7 @@ export default function RedeemPage() {
   }
 
   // Not authenticated - show login button
-  if (!user || !walletAddress) {
+  if (!authenticated || !walletAddress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-6">

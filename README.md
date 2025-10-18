@@ -1,15 +1,17 @@
-Context:
+**On The Dot**
 
-We’re building a hackathon project for ETHRome 2025 - it’s a way to seamlessly set up deposits for in-person sessions, using NFC chips.
+Hackathon project for ETHRome 2025 - it’s a way to seamlessly set up deposits for in-person sessions, using NFC chips.
+
+Polkadot Hub TestNet - contract:
+https://github.com/deca12x/OnTheDot-contracts
 
 Tech Stack:
 
 - Nextjs webapp (make contract calls from frontend, simple, not secured, optimised for mobile view)
 - Contract deployed on Polkadot Hub TestNet (Polkadot parachain that is EVM) https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
-- Civic Auth (embedded wallet) https://www.civic.com/auth
+- Privy Auth (embedded wallet) https://www.privy.io/
 - Storage is on a file called storage.json and on the contract (no db)
 - Polkadot Hardhat framework https://docs.polkadot.com/develop/smart-contracts/dev-environments/hardhat/
-- Instead of wagmi/viem, use https://papi.how/
 
 Polkadot Bounty Details:
 
@@ -54,7 +56,7 @@ Flow:
 Technical Flow of Page 1 “Join Event Form”
 
 1. User goes to page 1 (main domain)
-2. Login with Civic Auth
+2. Login with Privy Auth
 3. Fill in form
    1. Name
    2. GitHub / GitLab / dev portfolio link

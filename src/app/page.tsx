@@ -1,14 +1,16 @@
 "use client";
 
-import { useUser, useWallet } from "@civic/auth-web3/react";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useState, useEffect } from "react";
 import { getRegistrationByWallet, saveRegistration } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
 
 export default function Home() {
-  const { user, isLoading } = useUser();
-  const { address: walletAddress } = useWallet({ type: "ethereum" });
+  const { ready, authenticated, user } = usePrivy();
+  const { wallets } = useWallets();
+  const wallet = wallets[0]; // Get the first connected wallet
+  const walletAddress = wallet?.address;
   const [existingRegistration, setExistingRegistration] =
     useState<EventRegistration | null>(null);
   const [formData, setFormData] = useState({
@@ -33,8 +35,8 @@ export default function Home() {
     }
   }, [walletAddress]);
 
-  // Show loading state while Civic Auth initializes
-  if (isLoading) {
+  // Show loading state while Privy initializes
+  if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -43,7 +45,7 @@ export default function Home() {
   }
 
   // Not authenticated - show login button
-  if (!user || !walletAddress) {
+  if (!authenticated || !walletAddress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-6">
@@ -108,11 +110,29 @@ export default function Home() {
 
     setIsSubmitting(true);
     try {
+      console.log("🚀 [Page] Starting deposit");
+      console.log("🚀 [Page] Wallet address:", walletAddress);
+      console.log("🚀 [Page] Wallet:", wallet);
+
+      if (!wallet) {
+        throw new Error(
+          "Wallet not available. Please ensure you're logged in with Privy."
+        );
+      }
+
+      // Get the wallet provider from Privy
+      const provider = await wallet.getEthereumProvider();
+      console.log("🚀 [Page] Got wallet provider:", !!provider);
+
+      if (!provider) {
+        throw new Error("Could not get wallet provider from Privy");
+      }
+
       // Import contract functions
       const { makeDeposit } = await import("@/lib/contract");
 
-      // Make the deposit on-chain
-      const depositResult = await makeDeposit();
+      // Make the deposit on-chain using Privy's embedded wallet
+      const depositResult = await makeDeposit(provider);
 
       if (!depositResult.success) {
         throw new Error("Deposit transaction failed");
@@ -131,7 +151,9 @@ export default function Home() {
     } catch (error) {
       console.error("Error submitting registration:", error);
       const errorMessage =
-        error instanceof Error ? error.message : "Error submitting registration. Please try again.";
+        error instanceof Error
+          ? error.message
+          : "Error submitting registration. Please try again.";
       alert(errorMessage);
     } finally {
       setIsSubmitting(false);
@@ -162,7 +184,7 @@ export default function Home() {
               Complete your registration and pay 1 PAS deposit
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              Connected as: {user.name || user.email}
+              Connected as: {typeof user?.email === 'string' ? user.email : walletAddress || "User"}
             </p>
           </div>
           <div className="flex-shrink-0">
