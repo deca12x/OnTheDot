@@ -1,3 +1,5 @@
+<img width="1360" height="255" alt="Image" src="https://github.com/user-attachments/assets/f6a5a4fe-6a44-4493-9d36-aa592e37e529" />
+
 **On The Dot**
 
 Hackathon project for ETHRome 2025 - it’s a way to seamlessly set up deposits for in-person sessions, using NFC chips.
