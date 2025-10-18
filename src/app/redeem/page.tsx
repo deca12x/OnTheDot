@@ -8,7 +8,7 @@ import ConnectButton from "@/components/ConnectButton";
 import Link from "next/link";
 
 export default function RedeemPage() {
-  const { ready, authenticated, user } = usePrivy();
+  const { ready, authenticated } = usePrivy();
   const { wallets } = useWallets();
   const wallet = wallets[0]; // Get the first connected wallet
   const walletAddress = wallet?.address;

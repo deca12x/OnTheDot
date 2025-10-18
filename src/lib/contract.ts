@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers, Eip1193Provider } from "ethers";
 
 // Extend Window interface for ethereum
 declare global {
@@ -47,7 +47,7 @@ export function getContract() {
 }
 
 // Get signer from Privy embedded wallet provider
-export async function getSigner(walletProvider?: any) {
+export async function getSigner(walletProvider?: Eip1193Provider) {
   let provider: ethers.BrowserProvider;
 
   if (walletProvider) {
@@ -119,7 +119,7 @@ export async function checkHasDeposited(userAddress: string): Promise<boolean> {
 }
 
 // Make a deposit
-export async function makeDeposit(walletProvider?: any) {
+export async function makeDeposit(walletProvider?: Eip1193Provider) {
   console.log("💰 [Contract] Starting deposit process...");
   try {
     console.log("🔐 [Contract] Getting signer from wallet...");
@@ -186,7 +186,7 @@ export async function makeDeposit(walletProvider?: any) {
 }
 
 // Redeem deposit
-export async function redeemDeposit(walletProvider?: any) {
+export async function redeemDeposit(walletProvider?: Eip1193Provider) {
   console.log("💸 [Contract] Starting redeem process...");
   try {
     console.log("🔐 [Contract] Getting signer from wallet...");
@@ -287,7 +287,7 @@ export function getAddressExplorerLink(address: string): string {
 }
 
 // Add Polkadot Hub TestNet to wallet
-export async function addPolkadotHubTestNet(provider?: any) {
+export async function addPolkadotHubTestNet(provider?: Eip1193Provider) {
   const targetProvider = provider || window.ethereum;
 
   if (!targetProvider) {
@@ -319,7 +319,7 @@ export async function addPolkadotHubTestNet(provider?: any) {
 }
 
 // Switch to Polkadot Hub TestNet
-export async function switchToPolkadotHubTestNet(provider?: any) {
+export async function switchToPolkadotHubTestNet(provider?: Eip1193Provider) {
   const targetProvider = provider || window.ethereum;
 
   if (!targetProvider) {
@@ -332,9 +332,14 @@ export async function switchToPolkadotHubTestNet(provider?: any) {
       params: [{ chainId: `0x${CHAIN_ID.toString(16)}` }],
     });
     console.log("✅ [Contract] Switched to Polkadot Hub TestNet");
-  } catch (error: any) {
+  } catch (error: unknown) {
     // If the network doesn't exist, add it
-    if (error.code === 4902) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "code" in error &&
+      error.code === 4902
+    ) {
       console.log("🔄 [Contract] Network not found, adding it...");
       await addPolkadotHubTestNet(provider);
     } else {
