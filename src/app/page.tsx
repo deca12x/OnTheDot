@@ -1,15 +1,14 @@
 "use client";
 
-import { useUser } from "@civic/auth-web3/react";
+import { useUser, useWallet } from "@civic/auth-web3/react";
 import { useState, useEffect } from "react";
-import { useAccount } from "wagmi";
 import { getRegistrationByWallet, saveRegistration } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
 
 export default function Home() {
   const { user, isLoading } = useUser();
-  const { address: walletAddress, isConnected } = useAccount();
+  const { address: walletAddress } = useWallet({ type: "ethereum" });
   const [existingRegistration, setExistingRegistration] =
     useState<EventRegistration | null>(null);
   const [formData, setFormData] = useState({
@@ -44,7 +43,7 @@ export default function Home() {
   }
 
   // Not authenticated - show login button
-  if (!user) {
+  if (!user || !walletAddress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-6">
@@ -57,28 +56,6 @@ export default function Home() {
             </div>
           </div>
           <ConnectButton />
-        </div>
-      </div>
-    );
-  }
-
-  // User authenticated but wallet not connected yet
-  if (!isConnected || !walletAddress) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">
-              Connecting Wallet...
-            </div>
-            <div className="text-lg text-gray-600">
-              Please wait while we connect your wallet
-            </div>
-            <div className="text-sm text-gray-500 mt-2">
-              Logged in as: {user.name || user.email}
-            </div>
-          </div>
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
         </div>
       </div>
     );

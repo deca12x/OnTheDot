@@ -1,8 +1,7 @@
 "use client";
 
-import { useUser } from "@civic/auth-web3/react";
+import { useUser, useWallet } from "@civic/auth-web3/react";
 import { useState, useEffect, useCallback } from "react";
-import { useAccount } from "wagmi";
 import { getRegistrationByWallet } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
@@ -10,7 +9,7 @@ import Link from "next/link";
 
 export default function RedeemPage() {
   const { user, isLoading } = useUser();
-  const { address: walletAddress, isConnected } = useAccount();
+  const { address: walletAddress } = useWallet({ type: "ethereum" });
   const [registration, setRegistration] = useState<EventRegistration | null>(
     null
   );
@@ -105,7 +104,7 @@ export default function RedeemPage() {
   }
 
   // Not authenticated - show login button
-  if (!user || !isConnected) {
+  if (!user || !walletAddress) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="flex flex-col items-center gap-6">
