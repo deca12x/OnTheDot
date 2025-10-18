@@ -10,25 +10,9 @@
       "xcm": false,
       "polkadotJsApi": false
     },
-    "precompilesFamiliarity": 2,
-    "walletAddress": "0x1C578D23a0E8FC849Cd02B23F0978a8629690be3",
-    "depositPaid": true,
-    "depositTxHash": "0x90e0b1be846bb8"
-  },
-  {
-    "name": "GG",
-    "portfolioLink": "https://github.com/deca12x",
-    "hasUsedSubstratePolkadot": false,
-    "technologiesUsed": {
-      "ink": false,
-      "evmSolidity": true,
-      "polkaVM": false,
-      "xcm": false,
-      "polkadotJsApi": false
-    },
     "precompilesFamiliarity": 3,
     "walletAddress": "0xa1D959dB1c4E63b083903aEcF7e52Cb0A3fEb46D",
     "depositPaid": true,
-    "depositTxHash": "0xdc490ce602e82"
+    "depositTxHash": "0xb9197d674e34d3b8f68d01689bb7093b11fee4997444c30ecac446c1f882364d"
   }
 ]
