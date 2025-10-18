@@ -7,31 +7,26 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { http } from "wagmi";
 import { defineChain } from "viem";
 
-const polkadotAssetHub = defineChain({
-  id: 1000, // Asset Hub parachain ID
-  name: "Polkadot Asset Hub",
-  network: "polkadot-asset-hub",
-  nativeCurrency: { name: "DOT", symbol: "DOT", decimals: 10 },
+const polkadotHubTestnet = defineChain({
+  id: 420420422, // Polkadot Hub TestNet chain ID
+  name: "Polkadot Hub TestNet",
+  network: "polkadot-hub-testnet",
+  nativeCurrency: { name: "PAS", symbol: "PAS", decimals: 18 },
   rpcUrls: {
-    default: { http: ["https://polkadot-asset-hub-rpc.polkadot.io"] },
+    default: { http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"] },
   },
-});
-
-const polkadotAssetHubTestnet = defineChain({
-  id: 1001, // Asset Hub testnet parachain ID
-  name: "Polkadot Asset Hub Testnet",
-  network: "polkadot-asset-hub-testnet",
-  nativeCurrency: { name: "DOT", symbol: "DOT", decimals: 10 },
-  rpcUrls: {
-    default: { http: ["https://polkadot-asset-hub-testnet-rpc.polkadot.io"] },
+  blockExplorers: {
+    default: {
+      name: "BlockScout",
+      url: "https://blockscout-passet-hub.parity-testnet.parity.io"
+    },
   },
 });
 
 const wagmiConfig = createConfig({
-  chains: [polkadotAssetHub, polkadotAssetHubTestnet],
+  chains: [polkadotHubTestnet],
   transports: {
-    [polkadotAssetHub.id]: http(),
-    [polkadotAssetHubTestnet.id]: http(),
+    [polkadotHubTestnet.id]: http(),
   },
 });
 
