@@ -1,0 +1,18 @@
+[
+  {
+    "name": "Deca",
+    "portfolioLink": "https://github.com/deca12x",
+    "hasUsedSubstratePolkadot": false,
+    "technologiesUsed": {
+      "ink": false,
+      "evmSolidity": true,
+      "polkaVM": false,
+      "xcm": false,
+      "polkadotJsApi": false
+    },
+    "precompilesFamiliarity": 2,
+    "walletAddress": "0x1C578D23a0E8FC849Cd02B23F0978a8629690be3",
+    "depositPaid": true,
+    "depositTxHash": "0x90e0b1be846bb8"
+  }
+]

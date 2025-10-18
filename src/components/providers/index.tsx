@@ -7,31 +7,31 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { http } from "wagmi";
 import { defineChain } from "viem";
 
-const mantleMainnet = defineChain({
-  id: 5000,
-  name: "Mantle Mainnet",
-  network: "mantle",
-  nativeCurrency: { name: "MNT", symbol: "MNT", decimals: 18 },
+const polkadotAssetHub = defineChain({
+  id: 1000, // Asset Hub parachain ID
+  name: "Polkadot Asset Hub",
+  network: "polkadot-asset-hub",
+  nativeCurrency: { name: "DOT", symbol: "DOT", decimals: 10 },
   rpcUrls: {
-    default: { http: ["https://rpc.mantle.xyz"] },
+    default: { http: ["https://polkadot-asset-hub-rpc.polkadot.io"] },
   },
 });
 
-const mantleTestnet = defineChain({
-  id: 5003,
-  name: "Mantle Sepolia Testnet",
-  network: "mantle-sepolia",
-  nativeCurrency: { name: "MNT", symbol: "MNT", decimals: 18 },
+const polkadotAssetHubTestnet = defineChain({
+  id: 1001, // Asset Hub testnet parachain ID
+  name: "Polkadot Asset Hub Testnet",
+  network: "polkadot-asset-hub-testnet",
+  nativeCurrency: { name: "DOT", symbol: "DOT", decimals: 10 },
   rpcUrls: {
-    default: { http: ["https://rpc.sepolia.mantle.xyz"] },
+    default: { http: ["https://polkadot-asset-hub-testnet-rpc.polkadot.io"] },
   },
 });
 
 const wagmiConfig = createConfig({
-  chains: [mantleMainnet, mantleTestnet],
+  chains: [polkadotAssetHub, polkadotAssetHubTestnet],
   transports: {
-    [mantleMainnet.id]: http(),
-    [mantleTestnet.id]: http(),
+    [polkadotAssetHub.id]: http(),
+    [polkadotAssetHubTestnet.id]: http(),
   },
 });
 

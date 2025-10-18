@@ -1,227 +1,121 @@
-# Next.js + Civic Auth Template
+Context:
 
-This is a template for building web3 applications with Next.js and Civic Auth authentication.
+We’re building a hackathon project for ETHRome 2025 - it’s a way to seamlessly set up deposits for in-person sessions, using NFC chips.
 
-## Features
+Tech Stack:
 
-- Next.js 15 with App Router
-- Civic Auth authentication with Web3 support
-- TypeScript support
-- Tailwind CSS for styling
-- Protected routes with middleware
-- Embedded wallet support
-- Multi-chain compatibility (Mantle Mainnet & Testnet)
-- Modern UI components with Lucide React icons
+- Nextjs webapp (make contract calls from frontend, simple, not secured, optimised for mobile view)
+- Contract deployed on Polkadot Hub TestNet (Polkadot parachain that is EVM) https://docs.polkadot.com/develop/smart-contracts/connect-to-polkadot/
+- Civic Auth (embedded wallet) https://www.civic.com/auth
+- Storage is on a file called storage.json and on the contract (no db)
 
-## Getting Started
+Polkadot Bounty Details:
 
-### Prerequisites
+Smart Contract dApp Development on PAsset Hub testnet - $3400
 
-Before starting, you need a Civic Auth Client ID:
+**Objective**: Encourage the creation of innovative smart contracts using Solidity, deployed natively on Polkadot. You can check our [Idea Pool](https://www.morekudos.com/explore/certified-open-contributions-level-smart-contract) for inspiration for the projects.
 
-1. Visit [https://auth.civic.com](https://auth.civic.com)
-2. Sign up or log in to your account
-3. Create a new application to obtain your Client ID
-4. Copy the Client ID for use in this integration
+In this edition of ETHRome, we would like to emphasise the use of precompiles in the PVM environment. [You can check more about precompiles and PVM](https://docs.polkadot.com/develop/smart-contracts/precompiles/). Polkadot architecture opens **a new type of smart contracts** - using the same Solidity you can communicate with other rollups ( and bridges too ) - with [XCM precompile](https://docs.polkadot.com/develop/smart-contracts/precompiles/xcm-precompile/).
 
-### Installation
+**Prize Pool**: 3,400 USDC
 
-1. Clone the repository:
+- Base: 3 Prizes ( equal amounts )
+- Bonus: +$25 for X post with tags
+- Bonus: +$25 for developer feedback - performance of the app, cost, ease of deployment, etc - 50-150 words
+- Raffle: 100 DOT for all feedback submissions
 
-   ```bash
-   git clone <repository-url>
-   cd templateNextCivic
-   ```
+**✅ Submission checklist**
 
-2. Install dependencies:
+1. Working Deployment
 
-   ```bash
-   npm install
-   ```
+- Link to the MVP deployment at PAsset Hub testnet on subscan
+- Smart contracts deployed need to be original
+- Core features must be functional
+- Including a MVP frontend is necessary
 
-3. Set up environment variables:
+2. Product value
 
-   ```bash
-   cp .env.example .env.local
-   ```
+- Described user experience and potential impact within the Polkadot ecosystem
+- Use of precompiles will grant bonus points during judging
 
-4. Edit `.env.local` and add your Civic Auth Client ID:
+3. Project Documentation
 
-   ```
-   NEXT_PUBLIC_CIVIC_CLIENT_ID=your_civic_client_id_here
-   ```
+- Project description ( max 100 words )
+- Setup instructions
+- It is encouraged to pitch the project to the judges. The pitch should take 5 min max. Please use this time wisely, as the judges have probably gone over the documentation and/or the video, so please provide context and extra information
 
-5. Run the development server:
+Flow:
 
-   ```bash
-   npm run dev
-   ```
+1. When the user signs up to an event (workshop / bootcamp / presentation / meetup / happy hour) they pay a small deposit.
+2. When the user enters the venue on the day, they find an NFC chip - they tap the chip to seamlessly redeem their deposit.
 
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Technical Flow of Page 1 “Join Event Form”
 
-## Authentication
+1. User goes to page 1 (main domain)
+2. Login with Civic Auth
+3. Fill in form
+   1. Name
+   2. GitHub / GitLab / dev portfolio link
+   3. Have you used Substrate or Polkadot before? (Yes / No)
+   4. Which of these have you used?
+      ☐ ink! ☐ EVM / Solidity ☐ PolkaVM ☐ XCM ☐ Polkadot.js API
+      How familiar are you with precompiles on Polkadot? (1-5 scale)
+   5. pay 1 DOT deposit (actual payment to our smart contract via function deposit)
+4. Submit form (atomic, need deposit tx receipt, then save to db) - Store user info on DB
+5. Confirmation screen (shows a visual of a phone tapping a sticker, which says “Tap chip at the venue to redeem deposit”)
 
-This template uses Civic Auth for authentication with the following features:
+Technical Flow of Page 2 “Redeem Deposit”
 
-### Supported Login Methods
+1. When user taps chip, it goes to the URL (main domain /redeem)
+2. Reads the user’s wallet address, then checks on contract - if user’s wallet address is in list of EOA addresses who paid deposit
+3. If the address is in the list, returns deposit to EOA address
+4. Confirmation screen “Deposit Redeemed”
 
-- Email
-- Google OAuth
-- Wallet connection (Web3)
+Smart contract:
 
-### Web3 Features
+1. store global list of people who paid (empty at contract deployment)
+2. store admin wallet address (input in constructor)
+3. function deposit()
+   - sends 1 DOT to smart contract
+   - adds user’s EOA address to global list of people who paid
+4. function redeem()
+   - if user in global list of people who paid AND time is < 19th Oct 2025 at 13:00, then
+     - removes user from global list of people who paid
+     - sends 1 DOT to user
+   - else send all funds in contract to admin wallet address
 
-- **Embedded Wallets**: Automatically create Web3 wallets for users
-- **Multi-chain Support**: Supports Mantle Mainnet and Testnet
-- **Wallet Integration**: Compatible with existing wallets
+Page 1 UI (base domain):
 
-### Authentication Flow
+- If user is not authenticated, this page shows only one button - “Log in”
+- If user is authenticated AND user EOA Address is not in JSON Storage, this page shows the form with questions and a “Confirm and Send Deposit” button. Clicking the button displays the confirmation page with text “
+  1. Name
+  2. GitHub / GitLab / dev portfolio link
+  3. Have you used Substrate or Polkadot before? (Yes / No)
+  4. Which of these have you used?
+     ☐ ink! ☐ EVM / Solidity ☐ PolkaVM ☐ XCM ☐ Polkadot.js API
+     How familiar are you with precompiles on Polkadot? (1-5 scale)
+  5. pay 1 DOT deposit (actual payment to our smart contract via function deposit)
+- Else, show confirmation page - just text saying “Tap chip at the venue to redeem deposit”
 
-1. Users visit the login page (`/login`)
-2. They can sign in using email, Google, or wallet
-3. Once authenticated, they're redirected to the dashboard
-4. Protected routes automatically redirect unauthenticated users to login
+Page 2 UI (base domain /redeem):
 
-## Project Structure
+- If user is not authenticated, this page shows only one button - “Log in”
+- If user is authenticated AND user EOA Address is not in JSON Storage, this page shows confirmation page - just text saying “No deposit to withdraw”
+- If user is authenticated AND user EOA Address is in JSON Storage, this page shows a blank page with just text saying “Redeeming your deposit”… then once we receive tx receipt, change the text to “Deposit Successfully redeemed” and link to block explorer.
 
-```
-src/
-├── app/                    # Next.js app router pages
-│   ├── clans/             # Protected clan pages
-│   │   └── [clanId]/      # Dynamic clan page
-│   ├── login/             # Login page
-│   ├── globals.css        # Global styles
-│   ├── layout.tsx         # Root layout with providers
-│   └── page.tsx           # Home/dashboard page
-├── components/            # Reusable React components
-│   ├── providers/         # Auth and query providers
-│   └── ConnectButton.tsx  # Login/logout button
-├── lib/                   # Utility functions and data
-│   ├── data.ts           # Sample clan data
-│   └── types.ts          # TypeScript type definitions
-└── middleware.ts          # Route protection middleware
-```
+JSON Storage:
 
-## Key Components
+All these things are stored in a json object in a file (only after the user has successfully paid deposit)
 
-### CivicAuthProvider
+1. Name
+2. GitHub / GitLab / dev portfolio link
+3. Have you used Substrate or Polkadot before? (Yes / No)
+4. Which of these have you used?
+   ☐ ink! ☐ EVM / Solidity ☐ PolkaVM ☐ XCM ☐ Polkadot.js API
+   How familiar are you with precompiles on Polkadot? (1-5 scale)
+5. EOA Address
 
-Located in `src/components/providers/index.tsx`, this wraps the entire app with:
+Contract Storage:
 
-- Civic Auth authentication
-- React Query for data fetching
-- Wagmi for Web3 functionality
-- NuqsAdapter for URL state management
-
-### Middleware
-
-Located in `src/middleware.ts`, provides:
-
-- Route protection for authenticated pages
-- Public path configuration
-- Automatic redirects for unauthenticated users
-
-### ConnectButton
-
-A reusable component that handles login/logout functionality with loading states.
-
-## Configuration
-
-### Civic Auth Settings
-
-The Civic Auth provider is configured with:
-
-- **Theme**: Light mode with custom accent color
-- **Logo**: Custom logo from public assets
-- **Login Methods**: Email, Google, and Wallet
-- **Web3**: Enabled with Mantle chain support
-
-### Protected Routes
-
-The following routes require authentication:
-
-- `/` (dashboard)
-- `/clans/*` (all clan pages)
-
-### Public Routes
-
-These routes are accessible without authentication:
-
-- `/login`
-- `/api/*`
-- Static assets (`/_next/*`, `/favicon.ico`)
-
-## Customization
-
-### Adding New Chains
-
-To add support for additional blockchain networks, update the chain configuration in `src/components/providers/index.tsx`:
-
-```typescript
-const newChain = defineChain({
-  id: 1, // Chain ID
-  name: "Ethereum Mainnet",
-  network: "ethereum",
-  nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 },
-  rpcUrls: {
-    default: { http: ["https://eth.rpc.url"] },
-  },
-});
-```
-
-### Modifying Authentication Options
-
-Update the login methods in the Civic Auth configuration:
-
-```typescript
-loginMethods: ["email", "google", "wallet", "phone"]; // Add or remove methods
-```
-
-### Styling
-
-The template uses Tailwind CSS. Modify styles in:
-
-- `src/app/globals.css` for global styles
-- Individual components for component-specific styles
-- `tailwind.config.js` for theme customization
-
-## Environment Variables
-
-| Variable                      | Description               | Required |
-| ----------------------------- | ------------------------- | -------- |
-| `NEXT_PUBLIC_CIVIC_CLIENT_ID` | Your Civic Auth Client ID | Yes      |
-
-## Scripts
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-
-## Learn More
-
-To learn more about the technologies used in this template:
-
-- [Next.js Documentation](https://nextjs.org/docs)
-- [Civic Auth Documentation](https://docs.civic.com)
-- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
-- [Wagmi Documentation](https://wagmi.sh)
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Authentication not working**: Ensure your Civic Client ID is correctly set in `.env.local`
-2. **Middleware not protecting routes**: Verify `middleware.ts` is in the `src/` directory
-3. **Web3 features not working**: Check that you're using `@civic/auth-web3` package
-4. **Import errors**: Ensure the `@/*` path mapping points to `./src/*` in `tsconfig.json`
-
-### Getting Help
-
-- Check the [Civic Auth Documentation](https://docs.civic.com)
-- Visit the Civic community forums
-- Review the example implementation in this template
-
-## License
-
-This template is provided as-is for educational and development purposes.
+1. EOA Addresses
+2. Admin EOA Address
