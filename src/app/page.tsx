@@ -2,7 +2,6 @@
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
 import { useState, useEffect } from "react";
-import { getRegistrationByWallet, saveRegistration } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
 import { ethers } from "ethers";
@@ -53,27 +52,24 @@ export default function Home() {
   // Check for existing registration and fetch balance when user is loaded
   useEffect(() => {
     if (walletAddress) {
-      // First sync storage with contract, then check storage only
-      const syncAndCheck = async () => {
-        // Sync: Check contract and update storage if needed
+      // Check contract only - single source of truth
+      const checkDeposit = async () => {
         const { checkHasDeposited } = await import("@/lib/contract");
         const hasDepositedOnChain = await checkHasDeposited(walletAddress);
-        const storedRegistration = await getRegistrationByWallet(walletAddress);
 
-        // If storage says depositPaid but contract says no, clear it
-        if (storedRegistration?.depositPaid && !hasDepositedOnChain) {
-          console.log("⚠️ [Page] Syncing: clearing stale deposit from storage");
+        if (hasDepositedOnChain) {
+          // User has deposited, show confirmation
+          setExistingRegistration({
+            walletAddress,
+            depositPaid: true,
+          } as EventRegistration);
+        } else {
+          // No deposit, show form
           setExistingRegistration(null);
-          return;
         }
-
-        // Check only storage (single source of truth for UI)
-        setExistingRegistration(
-          storedRegistration?.depositPaid ? storedRegistration : null
-        );
       };
 
-      syncAndCheck();
+      checkDeposit();
       fetchPasBalance(walletAddress);
     }
   }, [walletAddress]);
@@ -266,16 +262,12 @@ export default function Home() {
         throw new Error("Deposit transaction failed");
       }
 
-      // Only save to storage.json after successful deposit
-      const registration: EventRegistration = {
-        ...formData,
+      // Deposit successful - set state to show confirmation
+      setExistingRegistration({
         walletAddress: walletAddress,
         depositPaid: true,
         depositTxHash: depositResult.txHash,
-      };
-
-      await saveRegistration(registration);
-      setExistingRegistration(registration);
+      } as EventRegistration);
     } catch (error) {
       console.error("Error submitting registration:", error);
       const errorMessage =
