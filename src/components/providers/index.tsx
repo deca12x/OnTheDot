@@ -21,7 +21,7 @@ const polkadotAssetHubTestnet = {
 };
 
 // Define login methods array outside to prevent recreation
-const loginMethodsArray: ("wallet" | "email")[] = ["wallet", "email"];
+const loginMethodsArray: ("wallet" | "google")[] = ["wallet", "google"];
 
 // Privy config with custom chain support
 const privyConfig = {
