@@ -14,5 +14,21 @@
     "walletAddress": "0xa1D959dB1c4E63b083903aEcF7e52Cb0A3fEb46D",
     "depositPaid": true,
     "depositTxHash": "0x2de1bfb25a0aa754e097f6a0082bd2faecd1b4681a975bba11045ba70ffee1a9"
+  },
+  {
+    "name": "Dude",
+    "portfolioLink": "https://github.com/deca12x",
+    "hasUsedSubstratePolkadot": false,
+    "technologiesUsed": {
+      "ink": false,
+      "evmSolidity": true,
+      "polkaVM": false,
+      "xcm": false,
+      "polkadotJsApi": false
+    },
+    "precompilesFamiliarity": 3,
+    "walletAddress": "0x0c64A555C9a84bD275d57fD7CfA179164a88d6de",
+    "depositPaid": true,
+    "depositTxHash": "0x2b225340362cf7511cff8d0ea665646fe2a6561ca4ff273ecf1b599ddf1a9eeb"
   }
 ]

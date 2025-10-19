@@ -167,7 +167,7 @@ export default function Home() {
           )}
 
           {/* ARM SVG below transaction */}
-          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto">
+          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto mt-10">
             <img
               src="/DOT_Background ARM.svg"
               alt=""
@@ -186,7 +186,7 @@ export default function Home() {
             />
           </div>
 
-          <div className="text-lg text-white/90 mb-2">
+          <div className="text-lg text-white/90 mb-2 mt-10">
             Tap the NFC sticker at the venue
           </div>
           <div className="text-sm text-white/70 mb-4">
@@ -415,19 +415,19 @@ export default function Home() {
               }
               className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white backdrop-blur-sm"
             >
-              <option key={1} value={1}>
+              <option value={1}>
                 1 - Not familiar at all
               </option>
-              <option key={2} value={2}>
+              <option value={2}>
                 2 - Slightly familiar
               </option>
-              <option key={3} value={3}>
+              <option value={3}>
                 3 - Moderately familiar
               </option>
-              <option key={4} value={4}>
+              <option value={4}>
                 4 - Very familiar
               </option>
-              <option key={5} value={5}>
+              <option value={5}>
                 5 - Expert level
               </option>
             </select>

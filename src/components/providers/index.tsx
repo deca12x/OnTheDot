@@ -33,18 +33,22 @@ const wagmiConfig = createConfig({
 
 const queryClient = new QueryClient();
 
+// Define login methods array outside to prevent recreation
+const loginMethodsArray: ("wallet" | "google")[] = ["wallet", "google"];
+const supportedChainsArray = [polkadotAssetHubTestnet];
+
 // Memoize Privy config to prevent re-renders that might cause key issues
 const privyConfig = {
   appearance: {
     theme: "light" as const,
     accentColor: "#676FFF" as const,
   },
-  loginMethods: ["wallet", "email"] as ("wallet" | "email")[], // Explicitly type as mutable array
+  loginMethods: loginMethodsArray,
   embeddedWallets: {
     createOnLogin: "users-without-wallets" as const,
   },
   defaultChain: polkadotAssetHubTestnet,
-  supportedChains: [polkadotAssetHubTestnet],
+  supportedChains: supportedChainsArray,
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {

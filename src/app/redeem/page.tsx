@@ -134,16 +134,63 @@ export default function RedeemPage() {
   // Not authenticated - show login button
   if (!authenticated || !walletAddress) {
     return (
-      <div className="min-h-screen flex items-center justify-center content-overlay px-4">
-        <div className="flex flex-col items-center gap-6 text-center">
-          <div className="text-center">
-            <div className="text-3xl md:text-4xl font-bold mb-2 font-pacifico">
-              ETHRome 2025 Deposit Redemption
+      <div className="min-h-screen flex items-center justify-center content-overlay px-4 relative">
+        {/* Corner Logos */}
+        <img
+          src="/ETHRome1b.png"
+          alt="Built at ETHRome"
+          className="absolute top-4 left-4 h-19 md:h-24 lg:h-29 w-auto z-20"
+        />
+        <img
+          src="/Polkadot.png"
+          alt="Built with Polkadot"
+          className="absolute top-4 right-4 h-16 md:h-20 lg:h-24 w-auto z-20"
+        />
+
+        <div className="relative flex flex-col items-center gap-6 text-center">
+          {/* Floating Smoke Background */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img
+              src="/DOT_Background SMOKE.svg"
+              alt=""
+              className="w-96 h-96 md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] opacity-20 animate-pulse-slow"
+              style={{
+                filter: "blur(1px)",
+                transform: "scale(3)",
+                zIndex: -1,
+              }}
+            />
+          </div>
+
+          <div className="text-center relative z-10">
+            <div className="text-5xl md:text-4xl font-bold mb-2 font-pacifico">
+              Redeem Deposit
             </div>
-            <div className="text-lg text-gray-200">
+            <div className="text-lg text-gray-200 mt-4">
               Please sign in to redeem your deposit
             </div>
           </div>
+
+          {/* ARM SVG between title and button */}
+          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto">
+            <img
+              src="/DOT_Background ARM.svg"
+              alt=""
+              className="absolute opacity-80"
+              style={{
+                // MANUAL ADJUSTMENT CONTROLS:
+                transform: "scale(2) translate(0px, -55px)", // scale(zoom) translate(x, y)
+                transformOrigin: "center center", // 'top left', 'center center', 'bottom right', etc.
+                width: "200px", // Fixed width for consistent cropping
+                height: "auto",
+                left: "50%",
+                top: "50%",
+                marginLeft: "-100px", // Half of width to center
+                marginTop: "-80px", // Adjust vertical centering
+              }}
+            />
+          </div>
+
           <ConnectButton />
         </div>
       </div>
