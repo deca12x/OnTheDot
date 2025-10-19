@@ -3,10 +3,27 @@ import * as React from "react";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
-// Define login methods array outside to prevent recreation
-const loginMethodsArray: ("wallet" | "google")[] = ["wallet", "google"];
+// Define Polkadot Asset Hub TestNet chain
+const polkadotAssetHubTestnet = {
+  id: 420420422,
+  name: "Polkadot Asset Hub TestNet",
+  network: "polkadot-asset-hub-testnet",
+  nativeCurrency: { name: "PAS", symbol: "PAS", decimals: 18 },
+  rpcUrls: {
+    default: { http: ["https://testnet-passet-hub-eth-rpc.polkadot.io"] },
+  },
+  blockExplorers: {
+    default: {
+      name: "Blockscout",
+      url: "https://blockscout-passet-hub.parity-testnet.parity.io",
+    },
+  },
+};
 
-// Simple Privy config - no wagmi, no viem
+// Define login methods array outside to prevent recreation
+const loginMethodsArray: ("wallet" | "email")[] = ["wallet", "email"];
+
+// Privy config with custom chain support
 const privyConfig = {
   appearance: {
     theme: "light" as const,
@@ -15,7 +32,11 @@ const privyConfig = {
   loginMethods: loginMethodsArray,
   embeddedWallets: {
     createOnLogin: "users-without-wallets" as const,
+    requireUserPasswordOnCreate: false,
+    noPromptOnSignature: false,
   },
+  defaultChain: polkadotAssetHubTestnet,
+  supportedChains: [polkadotAssetHubTestnet],
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {
