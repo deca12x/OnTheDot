@@ -1,5 +1,6 @@
 import { Providers } from "../components/providers";
 import "./globals.css";
+import Script from "next/script";
 
 export default function RootLayout({
   children,
@@ -19,6 +20,51 @@ export default function RootLayout({
         <link
           href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
           rel="stylesheet"
+        />
+        {/* Suppress Privy console warnings and block token price requests */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                // Suppress console warnings
+                const originalError = console.error;
+                const originalWarn = console.warn;
+
+                console.error = function(...args) {
+                  const message = String(args[0] || '');
+                  if (message.includes('Unable to fetch token price') ||
+                      message.includes('token_price') ||
+                      message.includes('404 (Not Found)') ||
+                      message.includes('GET https://auth.privy.io/api/v1/token_price') ||
+                      message.includes('React does not recognize the') && message.includes('isActive')) {
+                    return;
+                  }
+                  originalError.apply(console, args);
+                };
+
+                console.warn = function(...args) {
+                  const message = String(args[0] || '');
+                  if (message.includes('styled-components') && message.includes('isActive')) {
+                    return;
+                  }
+                  originalWarn.apply(console, args);
+                };
+
+                // Block token price API requests
+                if (typeof window !== 'undefined' && window.fetch) {
+                  const originalFetch = window.fetch;
+                  window.fetch = function(...args) {
+                    const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
+                    if (url && url.includes('token_price')) {
+                      // Return a mock rejected promise to silently fail
+                      return Promise.reject(new Error('Token price requests disabled'));
+                    }
+                    return originalFetch.apply(this, args);
+                  };
+                }
+              })();
+            `,
+          }}
         />
       </head>
       <body className="overflow-x-hidden">

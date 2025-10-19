@@ -126,7 +126,9 @@ export default function RedeemPage() {
   if (!ready) {
     return (
       <div className="min-h-screen flex items-center justify-center content-overlay">
-        <div className="text-lg font-semibold">Loading...</div>
+        <div className="backdrop-blur-sm bg-white/5 p-6 rounded-lg border border-white/20">
+          <div className="text-lg font-semibold text-white">Loading...</div>
+        </div>
       </div>
     );
   }
@@ -136,16 +138,30 @@ export default function RedeemPage() {
     return (
       <div className="min-h-screen flex items-center justify-center content-overlay px-4 relative">
         {/* Corner Logos */}
-        <img
-          src="/ETHRome1b.png"
-          alt="Built at ETHRome"
-          className="absolute top-4 left-4 h-19 md:h-24 lg:h-29 w-auto z-20"
-        />
-        <img
-          src="/Polkadot.png"
-          alt="Built with Polkadot"
-          className="absolute top-4 right-4 h-16 md:h-20 lg:h-24 w-auto z-20"
-        />
+        <a
+          href="https://www.ethrome.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 left-4 z-20"
+        >
+          <img
+            src="/ETHRome1b.png"
+            alt="Built at ETHRome"
+            className="h-19 md:h-24 lg:h-29 w-auto hover:scale-110 transition-transform duration-0"
+          />
+        </a>
+        <a
+          href="https://polkadot.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 right-4 z-20"
+        >
+          <img
+            src="/Polkadot.png"
+            alt="Built with Polkadot"
+            className="h-16 md:h-20 lg:h-24 w-auto hover:scale-110 transition-transform duration-0"
+          />
+        </a>
 
         <div className="relative flex flex-col items-center gap-6 text-center">
           {/* Floating Smoke Background */}
@@ -164,10 +180,7 @@ export default function RedeemPage() {
 
           <div className="text-center relative z-10">
             <div className="text-5xl md:text-4xl font-bold mb-2 font-pacifico">
-              Redeem Deposit
-            </div>
-            <div className="text-lg text-gray-200 mt-4">
-              Please sign in to redeem your deposit
+              On The Dot
             </div>
           </div>
 
@@ -197,24 +210,22 @@ export default function RedeemPage() {
     );
   }
 
-  // User is authenticated but has no registration
+  // User is authenticated but has no registration - show only background video
   if (!registration) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-red-50 rounded-lg border border-red-200 shadow-lg">
-          <div className="text-2xl font-bold text-red-800 mb-4 font-pacifico">
-            No Deposit to Withdraw
-          </div>
-          <div className="text-lg text-red-700 mb-6">
-            You haven&apos;t registered for the event or paid a deposit.
-          </div>
-          <Link
-            href="/"
-            className="inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Register for Event
-          </Link>
-        </div>
+      <div className="min-h-screen relative">
+        {/* Background Video */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/DOT_Background Video.mp4" type="video/mp4" />
+        </video>
+
+        {/* Privy components will be rendered on top of this background */}
       </div>
     );
   }
@@ -222,32 +233,57 @@ export default function RedeemPage() {
   // Redemption complete - show success
   if (redeemComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-green-50 rounded-lg border border-green-200 shadow-lg">
-          <div className="text-2xl font-bold text-green-800 mb-4 font-pacifico">
-            Deposit Successfully Redeemed! 🎉
-          </div>
-          <div className="text-lg text-green-700 mb-6">
-            Your 1 DOT deposit has been returned to your wallet
-          </div>
-          <div className="text-sm text-green-600 mb-4">
-            Welcome to ETHRome 2025, {registration.name}!
-          </div>
+      <div className="min-h-screen flex items-center justify-center px-4 relative">
+        {/* ConnectButton in top right corner */}
+        <div className="absolute top-6 right-9 z-20">
+          <ConnectButton />
+        </div>
+
+        <div className="max-w-md mx-auto text-center p-6 md:p-8">
           {txHash && (
-            <div className="bg-white p-3 rounded border mb-4">
-              <p className="text-xs text-gray-600 mb-1">Transaction Hash:</p>
-              <a
-                href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${txHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm font-mono break-all"
-              >
-                {txHash}
-              </a>
+            <div className="backdrop-blur-sm bg-white/5 p-4 rounded-lg border border-white/20 mb-4">
+              <div className="text-2xl font-bold text-white mb-4 font-pacifico text-center">
+                Redemption Complete!
+              </div>
+              <div className="flex items-center gap-4 justify-center">
+                <p className="text-sm font-medium text-white/90">
+                  Transaction:
+                </p>
+                <a
+                  href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/70 font-mono hover:text-white/90 transition-colors duration-200 underline"
+                >
+                  {txHash ? `${txHash.slice(0, 5)}...${txHash.slice(-5)}` : ""}
+                </a>
+              </div>
             </div>
           )}
-          <div className="text-6xl mb-4">✅</div>
-          <p className="text-sm text-gray-600">Enjoy the event!</p>
+
+          {/* Thumbs up image below transaction */}
+          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto mt-10">
+            <img
+              src="/thumbsup.png"
+              alt=""
+              className="absolute opacity-80"
+              style={{
+                // MANUAL ADJUSTMENT CONTROLS:
+                transform: "scale(1) translate(0px, 0px)", // scale(zoom) translate(x, y)
+                transformOrigin: "center center", // 'top left', 'center center', 'bottom right', etc.
+                width: "200px", // Fixed width for consistent cropping
+                height: "auto",
+                left: "50%",
+                top: "50%",
+                marginLeft: "-100px", // Half of width to center
+                marginTop: "-100px", // Adjust vertical centering
+              }}
+            />
+          </div>
+
+          <div className="text-lg text-white/90 mb-2 mt-10">
+            Your 1 PAS deposit has been returned
+          </div>
         </div>
       </div>
     );
@@ -255,19 +291,26 @@ export default function RedeemPage() {
 
   // Redemption in progress
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-blue-50 rounded-lg border border-blue-200 shadow-lg">
-        <div className="text-2xl font-bold text-blue-800 mb-4 font-pacifico">
-          Redeeming your deposit...
-        </div>
-        <div className="text-lg text-blue-700 mb-6">
-          Please wait while we process your redemption
-        </div>
-        <div className="flex items-center justify-center mb-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        </div>
-        <div className="text-sm text-blue-600">
-          Processing transaction on Polkadot Asset Hub...
+    <div className="min-h-screen flex items-center justify-center px-4 relative">
+      {/* ConnectButton in top right corner */}
+      <div className="absolute top-6 right-9 z-20">
+        <ConnectButton />
+      </div>
+
+      <div className="max-w-md mx-auto text-center p-6 md:p-8">
+        <div className="backdrop-blur-sm bg-white/5 p-6 rounded-lg border border-white/20">
+          <div className="text-2xl font-bold text-white mb-4 font-pacifico">
+            Redeeming your deposit...
+          </div>
+          <div className="text-lg text-white/90 mb-6">
+            Please wait while we process your redemption
+          </div>
+          <div className="flex items-center justify-center mb-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white/60"></div>
+          </div>
+          <div className="text-sm text-white/70">
+            Processing transaction on Polkadot Asset Hub...
+          </div>
         </div>
       </div>
     </div>

@@ -52,11 +52,16 @@ const privyConfig = {
 };
 
 export function Providers({ children }: { children: React.ReactNode }) {
+  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
+
+  if (!privyAppId) {
+    throw new Error(
+      "NEXT_PUBLIC_PRIVY_APP_ID is not set. Please add it to your environment variables in Vercel."
+    );
+  }
+
   return (
-    <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string}
-      config={privyConfig}
-    >
+    <PrivyProvider appId={privyAppId} config={privyConfig}>
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig}>
           <NuqsAdapter>{children}</NuqsAdapter>

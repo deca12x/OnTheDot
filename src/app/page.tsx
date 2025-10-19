@@ -53,7 +53,32 @@ export default function Home() {
   // Check for existing registration and fetch balance when user is loaded
   useEffect(() => {
     if (walletAddress) {
-      getRegistrationByWallet(walletAddress).then(setExistingRegistration);
+      // First sync storage with contract, then check storage only
+      const syncAndCheck = async () => {
+        // Sync: Check contract and update storage if needed
+        const { checkHasDeposited } = await import("@/lib/contract");
+        const hasDepositedOnChain = await checkHasDeposited(walletAddress);
+        const storedRegistration = await getRegistrationByWallet(walletAddress);
+
+        // If storage says depositPaid but contract says no, clear storage
+        if (storedRegistration?.depositPaid && !hasDepositedOnChain) {
+          console.log("⚠️ [Page] Syncing: clearing stale deposit from storage");
+          // Clear the depositPaid flag by saving updated registration
+          await saveRegistration({
+            ...storedRegistration,
+            depositPaid: false,
+            depositTxHash: undefined,
+          });
+        }
+
+        // Now check only storage (single source of truth for UI)
+        const updatedRegistration = await getRegistrationByWallet(walletAddress);
+        setExistingRegistration(
+          updatedRegistration?.depositPaid ? updatedRegistration : null
+        );
+      };
+
+      syncAndCheck();
       fetchPasBalance(walletAddress);
     }
   }, [walletAddress]);
@@ -72,16 +97,30 @@ export default function Home() {
     return (
       <div className="min-h-screen flex items-center justify-center content-overlay px-4 relative">
         {/* Corner Logos */}
-        <img
-          src="/ETHRome1b.png"
-          alt="Built at ETHRome"
-          className="absolute top-4 left-4 h-19 md:h-24 lg:h-29 w-auto z-20"
-        />
-        <img
-          src="/Polkadot.png"
-          alt="Built with Polkadot"
-          className="absolute top-4 right-4 h-16 md:h-20 lg:h-24 w-auto z-20"
-        />
+        <a
+          href="https://www.ethrome.org/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 left-4 z-20"
+        >
+          <img
+            src="/ETHRome1b.png"
+            alt="Built at ETHRome"
+            className="h-19 md:h-24 lg:h-29 w-auto hover:scale-110 transition-transform duration-0"
+          />
+        </a>
+        <a
+          href="https://polkadot.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="absolute top-4 right-4 z-20"
+        >
+          <img
+            src="/Polkadot.png"
+            alt="Built with Polkadot"
+            className="h-16 md:h-20 lg:h-24 w-auto hover:scale-110 transition-transform duration-0"
+          />
+        </a>
 
         <div className="relative flex flex-col items-center gap-6 text-center">
           {/* Floating Smoke Background */}
@@ -415,21 +454,11 @@ export default function Home() {
               }
               className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white backdrop-blur-sm"
             >
-              <option value={1}>
-                1 - Not familiar at all
-              </option>
-              <option value={2}>
-                2 - Slightly familiar
-              </option>
-              <option value={3}>
-                3 - Moderately familiar
-              </option>
-              <option value={4}>
-                4 - Very familiar
-              </option>
-              <option value={5}>
-                5 - Expert level
-              </option>
+              <option value={1}>1 - Not familiar at all</option>
+              <option value={2}>2 - Slightly familiar</option>
+              <option value={3}>3 - Moderately familiar</option>
+              <option value={4}>4 - Very familiar</option>
+              <option value={5}>5 - Expert level</option>
             </select>
           </div>
 
