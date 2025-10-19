@@ -7,6 +7,23 @@ import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { http } from "wagmi";
 import { defineChain } from "viem";
 
+// Suppress Privy errors immediately
+if (typeof window !== "undefined") {
+  const originalError = console.error;
+  console.error = (...args: unknown[]) => {
+    const message = String(args[0] || "");
+    if (
+      message.includes("Unable to fetch token price") ||
+      message.includes("token_price") ||
+      message.includes("420420422") ||
+      (message.includes("React does not recognize") && message.includes("isActive"))
+    ) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
+
 // Define Polkadot Asset Hub TestNet chain
 const polkadotAssetHubTestnet = defineChain({
   id: 420420422,
