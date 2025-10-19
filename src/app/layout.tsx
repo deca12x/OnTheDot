@@ -36,7 +36,7 @@ export default function RootLayout({
                       message.includes('token_price') ||
                       message.includes('404 (Not Found)') ||
                       message.includes('GET https://auth.privy.io/api/v1/token_price') ||
-                      message.includes('React does not recognize the') && message.includes('isActive')) {
+                      (message.includes('React does not recognize') && message.includes('isActive'))) {
                     return;
                   }
                   originalError.apply(console, args);
@@ -55,9 +55,14 @@ export default function RootLayout({
                   const originalFetch = window.fetch;
                   window.fetch = function(...args) {
                     const url = typeof args[0] === 'string' ? args[0] : args[0]?.url;
-                    if (url && url.includes('token_price')) {
-                      // Return a mock rejected promise to silently fail
-                      return Promise.reject(new Error('Token price requests disabled'));
+                    if (url && (url.includes('token_price') || url.includes('420420422'))) {
+                      // Return a mock successful response with null data
+                      return Promise.resolve({
+                        ok: false,
+                        status: 404,
+                        statusText: 'Not Found',
+                        json: () => Promise.resolve(null)
+                      });
                     }
                     return originalFetch.apply(this, args);
                   };

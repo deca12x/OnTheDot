@@ -1,6 +1,6 @@
 const { ethers } = require('ethers');
 
-const CONTRACT_ADDRESS = "0xd2BF62cCA0b8330c50ee87342C4aAcc3664E4D43";
+const CONTRACT_ADDRESS = "0x105eEc6d6f673FD8e0493efc0E599101D524aB07";
 const RPC_URL = "https://testnet-passet-hub-eth-rpc.polkadot.io";
 
 const EVENT_DEPOSIT_ABI = [
