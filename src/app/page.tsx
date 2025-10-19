@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { getRegistrationByWallet, saveRegistration } from "@/lib/data";
 import { EventRegistration } from "@/lib/types";
 import ConnectButton from "@/components/ConnectButton";
+import { ethers } from "ethers";
 
 export default function Home() {
   const { ready, authenticated, user } = usePrivy();
@@ -27,11 +28,33 @@ export default function Home() {
     precompilesFamiliarity: 1,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [pasBalance, setPasBalance] = useState<string>("0.0");
+  const [isLoadingBalance, setIsLoadingBalance] = useState(false);
 
-  // Check for existing registration when user is loaded
+  // Function to fetch PAS balance
+  const fetchPasBalance = async (address: string) => {
+    setIsLoadingBalance(true);
+    try {
+      // Connect to the Passet Hub testnet
+      const provider = new ethers.JsonRpcProvider(
+        "https://testnet-passet-hub-eth-rpc.polkadot.io"
+      );
+      const balance = await provider.getBalance(address);
+      const balanceInPas = ethers.formatEther(balance);
+      setPasBalance(parseFloat(balanceInPas).toFixed(4));
+    } catch (error) {
+      console.error("Error fetching PAS balance:", error);
+      setPasBalance("Error");
+    } finally {
+      setIsLoadingBalance(false);
+    }
+  };
+
+  // Check for existing registration and fetch balance when user is loaded
   useEffect(() => {
     if (walletAddress) {
       getRegistrationByWallet(walletAddress).then(setExistingRegistration);
+      fetchPasBalance(walletAddress);
     }
   }, [walletAddress]);
 
@@ -110,7 +133,12 @@ export default function Home() {
   // User is authenticated and has already registered - show confirmation
   if (existingRegistration) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 relative">
+        {/* ConnectButton in top right corner */}
+        <div className="absolute top-6 right-9 z-20">
+          <ConnectButton />
+        </div>
+
         <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-green-50 rounded-lg border border-green-200 shadow-lg">
           <div className="text-2xl font-bold text-green-800 mb-4 font-pacifico">
             Registration Complete! ✅
@@ -217,35 +245,34 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen py-6 md:py-8 px-4 content-overlay">
+    <div className="min-h-screen py-6 md:py-8 px-4 content-overlay relative">
+      {/* ConnectButton in top right corner */}
+      <div className="absolute top-6 right-9 z-20">
+        <ConnectButton />
+      </div>
+
       <div className="max-w-2xl mx-auto">
-        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 md:mb-8 gap-4">
-          <div className="text-center md:text-left flex-1">
+        <div className="mb-6 md:mb-8 mt-2">
+          <div className="text-center md:text-left">
             <h1 className="text-2xl md:text-3xl font-bold mb-2 text-white font-pacifico">
-              ETHRome 2025 Event Registration
+              Polkadot Workshop
             </h1>
+            <p className="text-gray-200 text-base md:text-lg mt-4">
+              Complete your registration and pay 1 PAS deposit.
+            </p>
             <p className="text-gray-200 text-base md:text-lg">
-              Complete your registration and pay 1 PAS deposit
+              Redeem the deposit when you attend the event.
             </p>
-            <p className="text-sm text-gray-300 mt-2">
-              Connected as:{" "}
-              {typeof user?.email === "string"
-                ? user.email
-                : walletAddress || "User"}
-            </p>
-          </div>
-          <div className="flex-shrink-0 self-center md:self-start">
-            <ConnectButton />
           </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 bg-white p-6 md:p-8 rounded-lg shadow-lg"
+          className="space-y-6 backdrop-blur-md bg-white/10 border border-white/20 p-6 md:p-8 rounded-xl shadow-2xl"
         >
           {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               Name *
             </label>
             <input
@@ -255,14 +282,14 @@ export default function Home() {
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/60 backdrop-blur-sm"
               placeholder="Your full name"
             />
           </div>
 
           {/* Portfolio Link */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               GitHub / GitLab / Dev Portfolio Link *
             </label>
             <input
@@ -275,18 +302,18 @@ export default function Home() {
                   portfolioLink: e.target.value,
                 }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white placeholder-white/60 backdrop-blur-sm"
               placeholder="https://github.com/yourusername"
             />
           </div>
 
           {/* Substrate/Polkadot Experience */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               Have you used Substrate or Polkadot before? *
             </label>
             <div className="space-y-2">
-              <label className="flex items-center">
+              <label className="flex items-center text-white/80">
                 <input
                   type="radio"
                   name="hasUsedSubstratePolkadot"
@@ -301,7 +328,7 @@ export default function Home() {
                 />
                 Yes
               </label>
-              <label className="flex items-center">
+              <label className="flex items-center text-white/80">
                 <input
                   type="radio"
                   name="hasUsedSubstratePolkadot"
@@ -321,13 +348,13 @@ export default function Home() {
 
           {/* Technologies Used */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               Which of these have you used? (Select all that apply)
             </label>
             <div className="space-y-2">
               {Object.entries(formData.technologiesUsed).map(
                 ([tech, checked]) => (
-                  <label key={tech} className="flex items-center">
+                  <label key={tech} className="flex items-center text-white/80">
                     <input
                       type="checkbox"
                       checked={checked}
@@ -353,7 +380,7 @@ export default function Home() {
 
           {/* Precompiles Familiarity */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-white/90 mb-2">
               How familiar are you with precompiles on Polkadot? (1-5 scale) *
             </label>
             <select
@@ -364,39 +391,70 @@ export default function Home() {
                   precompilesFamiliarity: parseInt(e.target.value),
                 }))
               }
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-white/50 text-white backdrop-blur-sm"
             >
-              <option value={1}>1 - Not familiar at all</option>
-              <option value={2}>2 - Slightly familiar</option>
-              <option value={3}>3 - Moderately familiar</option>
-              <option value={4}>4 - Very familiar</option>
-              <option value={5}>5 - Expert level</option>
+              <option key={1} value={1}>
+                1 - Not familiar at all
+              </option>
+              <option key={2} value={2}>
+                2 - Slightly familiar
+              </option>
+              <option key={3} value={3}>
+                3 - Moderately familiar
+              </option>
+              <option key={4} value={4}>
+                4 - Very familiar
+              </option>
+              <option key={5} value={5}>
+                5 - Expert level
+              </option>
             </select>
           </div>
 
-          {/* Deposit Information */}
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h3 className="font-medium text-blue-800 mb-2">
-              Deposit Information
-            </h3>
-            <p className="text-sm text-blue-700 mb-2">
-              A 1 DOT deposit will be required to complete registration. This
-              deposit will be returned when you attend the event.
-            </p>
-            <p className="text-xs text-blue-600">
-              Your wallet: {walletAddress}
-            </p>
+          {/* Wallet and Funds Information */}
+          <div className="backdrop-blur-sm bg-white/5 p-4 rounded-lg border border-white/20">
+            <div className="space-y-3">
+              {/* Your Wallet */}
+              <div className="flex items-center gap-4">
+                <p className="text-sm font-medium text-white/90">
+                  Your Wallet:
+                </p>
+                <a
+                  href={`https://blockscout-passet-hub.parity-testnet.parity.io/address/${walletAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/70 font-mono hover:text-white/90 transition-colors duration-200 underline"
+                >
+                  {walletAddress
+                    ? `${walletAddress.slice(0, 5)}...${walletAddress.slice(
+                        -5
+                      )}`
+                    : ""}
+                </a>
+              </div>
+
+              {/* Your Balance */}
+              <div className="flex items-center gap-4">
+                <p className="text-sm font-medium text-white/90">
+                  Your Balance:
+                </p>
+                <p className="text-sm text-white/80 font-mono">
+                  {isLoadingBalance ? "Loading..." : `${pasBalance} PAS`}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="w-full backdrop-blur-md bg-white/10 border border-white/40 py-3 px-4 rounded-md hover:bg-white/40 hover:border-white/50 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all duration-200"
+            style={{ color: "#FFB0CB" }}
           >
             {isSubmitting
               ? "Processing Deposit..."
-              : "Complete Registration & Pay 1 PAS Deposit"}
+              : "Submit & Pay 1 PAS Deposit"}
           </button>
         </form>
       </div>

@@ -1,1 +1,18 @@
-[]
+[
+  {
+    "name": "Jo",
+    "portfolioLink": "https://github.com/deca12x",
+    "hasUsedSubstratePolkadot": false,
+    "technologiesUsed": {
+      "ink": false,
+      "evmSolidity": true,
+      "polkaVM": false,
+      "xcm": false,
+      "polkadotJsApi": false
+    },
+    "precompilesFamiliarity": 3,
+    "walletAddress": "0xa1D959dB1c4E63b083903aEcF7e52Cb0A3fEb46D",
+    "depositPaid": true,
+    "depositTxHash": "0x2de1bfb25a0aa754e097f6a0082bd2faecd1b4681a975bba11045ba70ffee1a9"
+  }
+]
