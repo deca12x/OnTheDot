@@ -139,36 +139,58 @@ export default function Home() {
           <ConnectButton />
         </div>
 
-        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-green-50 rounded-lg border border-green-200 shadow-lg">
-          <div className="text-2xl font-bold text-green-800 mb-4 font-pacifico">
-            Registration Complete! ✅
-          </div>
-          <div className="text-lg text-green-700 mb-6">
-            Tap chip at the venue to redeem deposit
-          </div>
-          <div className="text-sm text-green-600 mb-4">
-            Your 1 PAS deposit is secured on the blockchain
-          </div>
+        <div className="max-w-md mx-auto text-center p-6 md:p-8">
           {existingRegistration.depositTxHash && (
-            <div className="bg-white p-3 rounded border mb-4">
-              <p className="text-xs text-gray-600 mb-1">Transaction Hash:</p>
-              <a
-                href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${existingRegistration.depositTxHash}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 text-sm font-mono break-all"
-              >
-                {existingRegistration.depositTxHash}
-              </a>
+            <div className="backdrop-blur-sm bg-white/5 p-4 rounded-lg border border-white/20 mb-4">
+              <div className="text-2xl font-bold text-white mb-4 font-pacifico text-center">
+                Registration Complete!
+              </div>
+              <div className="flex items-center gap-4 justify-center">
+                <p className="text-sm font-medium text-white/90">
+                  Transaction:
+                </p>
+                <a
+                  href={`https://blockscout-passet-hub.parity-testnet.parity.io/tx/${existingRegistration.depositTxHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/70 font-mono hover:text-white/90 transition-colors duration-200 underline"
+                >
+                  {existingRegistration.depositTxHash
+                    ? `${existingRegistration.depositTxHash.slice(
+                        0,
+                        5
+                      )}...${existingRegistration.depositTxHash.slice(-5)}`
+                    : ""}
+                </a>
+              </div>
             </div>
           )}
-          <div className="flex items-center justify-center">
-            <div className="text-6xl">📱</div>
-            <div className="mx-4 text-2xl">→</div>
-            <div className="text-6xl">🏷️</div>
+
+          {/* ARM SVG below transaction */}
+          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto">
+            <img
+              src="/DOT_Background ARM.svg"
+              alt=""
+              className="absolute opacity-80"
+              style={{
+                // MANUAL ADJUSTMENT CONTROLS:
+                transform: "scale(2) translate(0px, -55px)", // scale(zoom) translate(x, y)
+                transformOrigin: "center center", // 'top left', 'center center', 'bottom right', etc.
+                width: "200px", // Fixed width for consistent cropping
+                height: "auto",
+                left: "50%",
+                top: "50%",
+                marginLeft: "-100px", // Half of width to center
+                marginTop: "-80px", // Adjust vertical centering
+              }}
+            />
           </div>
-          <div className="text-sm text-gray-600 mt-4">
-            Registered as: {existingRegistration.name}
+
+          <div className="text-lg text-white/90 mb-2">
+            Tap the NFC sticker at the venue
+          </div>
+          <div className="text-sm text-white/70 mb-4">
+            to redeem your 1 PAS deposit
           </div>
         </div>
       </div>

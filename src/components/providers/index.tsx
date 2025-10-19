@@ -37,15 +37,15 @@ const queryClient = new QueryClient();
 const privyConfig = {
   appearance: {
     theme: "light" as const,
-    accentColor: "#676FFF",
+    accentColor: "#676FFF" as const,
   },
-  loginMethods: ["wallet", "email"] as const, // Reordered for stability
+  loginMethods: ["wallet", "email"] as ("wallet" | "email")[], // Explicitly type as mutable array
   embeddedWallets: {
     createOnLogin: "users-without-wallets" as const,
   },
   defaultChain: polkadotAssetHubTestnet,
   supportedChains: [polkadotAssetHubTestnet],
-} as const;
+};
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
