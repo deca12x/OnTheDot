@@ -2,6 +2,8 @@
 
 **On The Dot**
 
+🌐 https://www.onthedot.live/ 🌐
+
 Hackathon project for ETHRome 2025 - it’s a way to seamlessly set up deposits for in-person sessions, using NFC chips.
 
 Polkadot Hub TestNet - contract:
