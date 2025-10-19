@@ -125,8 +125,8 @@ export default function RedeemPage() {
   // Show loading state while Privy initializes
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center content-overlay">
+        <div className="text-lg font-semibold">Loading...</div>
       </div>
     );
   }
@@ -134,13 +134,13 @@ export default function RedeemPage() {
   // Not authenticated - show login button
   if (!authenticated || !walletAddress) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
+      <div className="min-h-screen flex items-center justify-center content-overlay px-4">
+        <div className="flex flex-col items-center gap-6 text-center">
           <div className="text-center">
-            <div className="text-3xl font-bold mb-2">
+            <div className="text-3xl md:text-4xl font-bold mb-2 font-pacifico">
               ETHRome 2025 Deposit Redemption
             </div>
-            <div className="text-lg text-gray-600">
+            <div className="text-lg text-gray-200">
               Please sign in to redeem your deposit
             </div>
           </div>
@@ -153,9 +153,9 @@ export default function RedeemPage() {
   // User is authenticated but has no registration
   if (!registration) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center p-8 bg-red-50 rounded-lg border border-red-200">
-          <div className="text-2xl font-bold text-red-800 mb-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-red-50 rounded-lg border border-red-200 shadow-lg">
+          <div className="text-2xl font-bold text-red-800 mb-4 font-pacifico">
             No Deposit to Withdraw
           </div>
           <div className="text-lg text-red-700 mb-6">
@@ -175,9 +175,9 @@ export default function RedeemPage() {
   // Redemption complete - show success
   if (redeemComplete) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center p-8 bg-green-50 rounded-lg border border-green-200">
-          <div className="text-2xl font-bold text-green-800 mb-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-green-50 rounded-lg border border-green-200 shadow-lg">
+          <div className="text-2xl font-bold text-green-800 mb-4 font-pacifico">
             Deposit Successfully Redeemed! 🎉
           </div>
           <div className="text-lg text-green-700 mb-6">
@@ -208,9 +208,9 @@ export default function RedeemPage() {
 
   // Redemption in progress
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="max-w-md mx-auto text-center p-8 bg-blue-50 rounded-lg border border-blue-200">
-        <div className="text-2xl font-bold text-blue-800 mb-4">
+    <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-blue-50 rounded-lg border border-blue-200 shadow-lg">
+        <div className="text-2xl font-bold text-blue-800 mb-4 font-pacifico">
           Redeeming your deposit...
         </div>
         <div className="text-lg text-blue-700 mb-6">

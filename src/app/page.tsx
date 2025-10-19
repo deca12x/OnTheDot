@@ -38,8 +38,8 @@ export default function Home() {
   // Show loading state while Privy initializes
   if (!ready) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center content-overlay">
+        <div className="text-lg font-semibold">Loading...</div>
       </div>
     );
   }
@@ -47,16 +47,60 @@ export default function Home() {
   // Not authenticated - show login button
   if (!authenticated || !walletAddress) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="flex flex-col items-center gap-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold mb-2">
-              ETHRome 2025 Event Registration
-            </div>
-            <div className="text-lg text-gray-600">
-              Please sign in to register for the event
+      <div className="min-h-screen flex items-center justify-center content-overlay px-4 relative">
+        {/* Corner Logos */}
+        <img
+          src="/ETHRome1b.png"
+          alt="Built at ETHRome"
+          className="absolute top-4 left-4 h-19 md:h-24 lg:h-29 w-auto z-20"
+        />
+        <img
+          src="/Polkadot.png"
+          alt="Built with Polkadot"
+          className="absolute top-4 right-4 h-16 md:h-20 lg:h-24 w-auto z-20"
+        />
+
+        <div className="relative flex flex-col items-center gap-6 text-center">
+          {/* Floating Smoke Background */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <img
+              src="/DOT_Background SMOKE.svg"
+              alt=""
+              className="w-96 h-96 md:w-[500px] md:h-[500px] lg:w-[600px] lg:h-[600px] opacity-20 animate-pulse-slow"
+              style={{
+                filter: "blur(1px)",
+                transform: "scale(3)",
+                zIndex: -1,
+              }}
+            />
+          </div>
+
+          <div className="text-center relative z-10">
+            <div className="text-5xl md:text-4xl font-bold mb-2 font-pacifico">
+              On The Dot
             </div>
           </div>
+
+          {/* ARM SVG between title and button */}
+          <div className="relative z-10 my-1 overflow-hidden h-72 md:h-80 lg:h-96 w-64 md:w-80 lg:w-96 mx-auto">
+            <img
+              src="/DOT_Background ARM.svg"
+              alt=""
+              className="absolute opacity-80"
+              style={{
+                // MANUAL ADJUSTMENT CONTROLS:
+                transform: "scale(2) translate(0px, -55px)", // scale(zoom) translate(x, y)
+                transformOrigin: "center center", // 'top left', 'center center', 'bottom right', etc.
+                width: "200px", // Fixed width for consistent cropping
+                height: "auto",
+                left: "50%",
+                top: "50%",
+                marginLeft: "-100px", // Half of width to center
+                marginTop: "-80px", // Adjust vertical centering
+              }}
+            />
+          </div>
+
           <ConnectButton />
         </div>
       </div>
@@ -66,9 +110,9 @@ export default function Home() {
   // User is authenticated and has already registered - show confirmation
   if (existingRegistration) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="max-w-md mx-auto text-center p-8 bg-green-50 rounded-lg border border-green-200">
-          <div className="text-2xl font-bold text-green-800 mb-4">
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="max-w-md mx-auto text-center p-6 md:p-8 bg-green-50 rounded-lg border border-green-200 shadow-lg">
+          <div className="text-2xl font-bold text-green-800 mb-4 font-pacifico">
             Registration Complete! ✅
           </div>
           <div className="text-lg text-green-700 mb-6">
@@ -173,28 +217,31 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen py-8 px-4">
+    <div className="min-h-screen py-6 md:py-8 px-4 content-overlay">
       <div className="max-w-2xl mx-auto">
-        <div className="flex justify-between items-start mb-8">
-          <div className="text-center flex-1">
-            <h1 className="text-3xl font-bold mb-2">
+        <div className="flex flex-col md:flex-row md:justify-between md:items-start mb-6 md:mb-8 gap-4">
+          <div className="text-center md:text-left flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold mb-2 text-white font-pacifico">
               ETHRome 2025 Event Registration
             </h1>
-            <p className="text-gray-600">
+            <p className="text-gray-200 text-base md:text-lg">
               Complete your registration and pay 1 PAS deposit
             </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Connected as: {typeof user?.email === 'string' ? user.email : walletAddress || "User"}
+            <p className="text-sm text-gray-300 mt-2">
+              Connected as:{" "}
+              {typeof user?.email === "string"
+                ? user.email
+                : walletAddress || "User"}
             </p>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 self-center md:self-start">
             <ConnectButton />
           </div>
         </div>
 
         <form
           onSubmit={handleSubmit}
-          className="space-y-6 bg-white p-8 rounded-lg shadow-lg"
+          className="space-y-6 bg-white p-6 md:p-8 rounded-lg shadow-lg"
         >
           {/* Name */}
           <div>
