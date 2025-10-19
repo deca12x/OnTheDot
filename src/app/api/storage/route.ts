@@ -53,3 +53,43 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+
+// DELETE - Remove a registration from storage.json
+export async function DELETE(request: NextRequest) {
+  try {
+    const { walletAddress } = await request.json();
+
+    if (!walletAddress) {
+      return NextResponse.json(
+        { error: "Wallet address is required" },
+        { status: 400 }
+      );
+    }
+
+    // Read existing registrations
+    let registrations: EventRegistration[] = [];
+    try {
+      const fileContent = await fs.readFile(STORAGE_FILE, "utf-8");
+      registrations = JSON.parse(fileContent);
+    } catch {
+      // File doesn't exist, nothing to delete
+      return NextResponse.json({ success: true });
+    }
+
+    // Remove the registration for this wallet address
+    registrations = registrations.filter(
+      (r) => r.walletAddress !== walletAddress
+    );
+
+    // Write back to file
+    await fs.writeFile(STORAGE_FILE, JSON.stringify(registrations, null, 2));
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting registration:", error);
+    return NextResponse.json(
+      { error: "Failed to delete registration" },
+      { status: 500 }
+    );
+  }
+}

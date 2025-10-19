@@ -88,6 +88,21 @@ export default function RedeemPage() {
       }
 
       setTxHash(redeemResult.txHash);
+
+      // Delete the user's record from storage.json after successful redemption
+      try {
+        await fetch("/api/storage", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ walletAddress }),
+        });
+      } catch (error) {
+        console.error("Error deleting registration from storage:", error);
+        // Don't throw here - redemption was successful, storage cleanup is secondary
+      }
+
       setRedeemComplete(true);
     } catch (error) {
       console.error("Error redeeming deposit:", error);
