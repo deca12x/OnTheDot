@@ -60,21 +60,16 @@ export default function Home() {
         const hasDepositedOnChain = await checkHasDeposited(walletAddress);
         const storedRegistration = await getRegistrationByWallet(walletAddress);
 
-        // If storage says depositPaid but contract says no, clear storage
+        // If storage says depositPaid but contract says no, clear it
         if (storedRegistration?.depositPaid && !hasDepositedOnChain) {
           console.log("⚠️ [Page] Syncing: clearing stale deposit from storage");
-          // Clear the depositPaid flag by saving updated registration
-          await saveRegistration({
-            ...storedRegistration,
-            depositPaid: false,
-            depositTxHash: undefined,
-          });
+          setExistingRegistration(null);
+          return;
         }
 
-        // Now check only storage (single source of truth for UI)
-        const updatedRegistration = await getRegistrationByWallet(walletAddress);
+        // Check only storage (single source of truth for UI)
         setExistingRegistration(
-          updatedRegistration?.depositPaid ? updatedRegistration : null
+          storedRegistration?.depositPaid ? storedRegistration : null
         );
       };
 
