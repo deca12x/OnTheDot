@@ -18,7 +18,7 @@ declare global {
 }
 
 // Contract configuration
-export const CONTRACT_ADDRESS = "0x105eEc6d6f673FD8e0493efc0E599101D524aB07";
+export const CONTRACT_ADDRESS = "0x654B9f835d8EbaC03f9bcBF8BE10A56141175144";
 export const RPC_URL = "https://testnet-passet-hub-eth-rpc.polkadot.io";
 export const CHAIN_ID = 420420422;
 export const BLOCK_EXPLORER =
