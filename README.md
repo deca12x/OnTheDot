@@ -16,6 +16,7 @@ Tech Stack:
 - Privy Auth (embedded wallet) https://www.privy.io/
 - Storage is on a file called storage.json and on the contract (no db)
 - Polkadot Hardhat framework https://docs.polkadot.com/develop/smart-contracts/dev-environments/hardhat/
+- Thanks Nemanya for the setup https://github.com/Nemanya8/testupm
 
 Polkadot Bounty Details:
 
